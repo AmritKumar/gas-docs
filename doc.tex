@@ -22,6 +22,11 @@
 % Uncomment the two lines below to get rid of the numbers in the table of contents
 %\let\Contentsline\contentsline
 %\renewcommand\contentsline[3]{\Contentsline{#1}{#2}{}}
+\usepackage{marvosym}
+\usepackage{fontawesome}
+\usepackage{tipa}
+
+
 
 \makeindex
 
@@ -31,87 +36,100 @@
 \title{\vspace{-2cm}
  \textbf{Gas Costs on \textsc{Zilliqa}}}
 
+\author{
+ 	\href{https://www.zilliqa.com/team.html}{The \textsc{Zilliqa} Team} \\
+    \Mundus~\href{https://www.zilliqa.com}{\texttt{www.zilliqa.com}}
+\Letter~\href{mailto:enquiry@zilliqa.com}{\texttt{enquiry@zilliqa.com}}
+\faTwitter~\href{https://twitter.com/zilliqa}{\texttt{@zilliqa}
+}}
+
+
 \maketitle
 
 \section{Storage Cost}
 
-The storage cost (presented in \autoref{tab:storage}) depends on the type of
-literal being stored. In the table, we assume that $t$ is the literal being
-stored.
+Storage cost (presented in \autoref{tab:storage}) depends on the type of
+literal to be stored. In the table below, $\ell$ denotes the literal being
+stored and $litcost(\ell)$, the cost of storing it.
 
 
 \begin{table}[!hbt]
 	\caption{Storage cost for literals. \label{tab:storage} }
 \centering
-	\begin{tabular}{|p{2.0cm}|p{6.5cm}|p{6cm}|}
+	\begin{tabular}{|c|p{6.7cm}|p{6cm}|}
 	\hline
-		\textbf{Literal $(t)$}  & \textbf{$Cost(t)$} & \textbf{Remarks} \\ \hline
-	  	\texttt{\textcolor{teal}{StringLit}}  & $$ 
+		\textbf{Literal Type}  & \textbf{$litcost(\ell)$} & \textbf{Remarks} \\ \hline
+	  	\texttt{\textcolor{teal}{String}}  & $$ 
 	  	\begin{cases}
-      20, & \text{if } len(t) \leq 20, \\
-      len(t), & \text{else } \\
+      20, & \text{if } len(\ell) \leq 20, \\
+      len(\ell), & \text{else } \\
   \end{cases} $$ & $len(\cdot)$ computes the length of an input string, e.g.,
   		$len(\texttt{"Hello"})$ = 5.  \\ \hline
-				\texttt{\textcolor{teal}{IntLit32}},
-				\texttt{\textcolor{teal}{UintLit32}}  & 4
-				& \multirow{8}{6cm}
+				\texttt{\textcolor{teal}{Int32}},
+				\texttt{\textcolor{teal}{Uint32}}  & $4$
+				& \multirow{4}{6cm}
 				{Cost is the size of the integer in bytes.} \\ \cline{1-2} 
-		\texttt{\textcolor{teal}{IntLit64}},
-		\texttt{\textcolor{teal}{UintLit64}}   & 8 & \\ \cline{1-2}
-		\texttt{\textcolor{teal}{IntLit128}},
-		\texttt{\textcolor{teal}{UintLit128}}   & 16 &\\ \cline{1-2}
-		\texttt{\textcolor{teal}{IntLit256}},
-		\texttt{\textcolor{teal}{UintLit256}}  & 32 & \\ \hline
-		\texttt{\textcolor{teal}{BNum}} &  32 & Internally represented as a 256
-		bits unsigned integer. \\ \hline
-		\texttt{\textcolor{teal}{ByStrX}}  & $width(t)$ & $width(\cdot)$ returns
-		the number of bytes represented by the input, e.g.,
+		\texttt{\textcolor{teal}{Int64}},
+		\texttt{\textcolor{teal}{Uint64}}   & $8$ & \\ \cline{1-2}
+		\texttt{\textcolor{teal}{Int128}},
+		\texttt{\textcolor{teal}{Uint128}}   & $16$ &\\ \cline{1-2}
+		\texttt{\textcolor{teal}{Int256}},
+		\texttt{\textcolor{teal}{Uint256}}  & $32$ & \\ \hline
+		\texttt{\textcolor{teal}{BNum}} &  $32$ & Internally represented as a
+		256-bits unsigned integer. \\ \hline
+		\texttt{\textcolor{teal}{ByStrX}}  & $width(\ell)$ & $width(\cdot)$ returns
+		the number of bytes needed to represent the hexadecimal input, e.g.,
 		$width(\texttt{0x1cd2}) = 2.$ \\ \hline
-		\texttt{\textcolor{teal}{ByStr}}  & $len(t)-2$ & $len(\cdot)$ returns
+		\texttt{\textcolor{teal}{ByStr}}  & $len(\ell)-2$ & $len(\cdot)$ returns
 		the length of the string representation of the input, e.g.,
-		$len(\texttt{0x1cd2}) = 6.$ \\ \hline
-		\texttt{\textcolor{teal}{Msg}} 
-		& For $t = \{s_1 : v_1; s_2 : v_2;
+		$len(\texttt{0x1cd2}) = 6. $ \textcolor{red}{So, the cost of ByStrX and ByStr is the
+		same?} \\ \hline
+		\texttt{\textcolor{teal}{Messsage}} 
+		& For $\ell = \{s_1 : v_1; s_2 : v_2;
 		\ldots, s_n : v_n\}$:
 		$$ \begin{cases}
     		0, & \text{if } n = 0,  \\
-    cost(\{s_2 : v_2; \ldots, s_n : v_n\}) \\
-    		 + cost(s_1) + cost(v_1), & 
+    litcost(\{s_2 : v_2; \ldots, s_n : v_n\}) \\
+    		 + litcost(s_1) + litcost(v_1), & 
     		\text{else } \\
   \end{cases}
-		$$ & As \texttt{\textcolor{teal}{Msg}} is an associative array
-		between a  \texttt{\textcolor{teal}{StringLit}} (denoted $s_i$) and a
-		value literal (denoted $v_i$), cost
+		$$ & As \texttt{\textcolor{teal}{Messsage}} is an associative array
+		between a  \texttt{\textcolor{teal}{String}} literal (denoted $s_i$) and a
+		value literal (denoted $v_i$), $litcost$
 		is recursively computed by summing up over each $s_i : v_i$.   \\ \hline
 		\texttt{\textcolor{teal}{Map}} &
-		For $t = \{(k_1 \rightarrow v_1), 
+		For $\ell = \{(k_1 \rightarrow v_1), 
 		\ldots, (k_n \rightarrow v_n)\}$:
 		$$ \begin{cases}
     		0, & \text{if } n = 0,  \\
-  			\sum_{(k \rightarrow v) \in t} {cost(k) + cost(v)},  &
+  			\sum_{(k \rightarrow v) \in \ell} {litcost(k) + litcost(v)},  &
     		\text{else } \\
   \end{cases}
 		$$ & As \texttt{\textcolor{teal}{Map}} maps a key literal ($k_i$) to a
-		value literal ($v_i$),  cost
+		value literal ($v_i$),  $litcost$
 		is recursively computed by summing up over each $(k_i \rightarrow v_i)$ . \\ \hline
-		\texttt{\textcolor{teal}{ADTValue}} & For $t = \texttt{cname}\;
+		\texttt{\textcolor{teal}{ADT}} & For $\ell = \texttt{cname}\;
 		\{\texttt{types}\} \; t_1 t_2 \ldots t_n $:
 		$$ \begin{cases}
     		0, & \text{if } n = 0,  \\
-  			\sum_{i} {cost(t_i)},  &
+  			\sum_{i} {litcost(t_i)},  &
     		\text{else } \\
   		\end{cases}
 		$$ 
 		
-		& \texttt{\textcolor{teal}{ADTValue}} take a constructor name
-		(\texttt{cname}), types of the arguments \texttt{types} and arguments
+		& An \texttt{\textcolor{teal}{ADT}} literal takes a constructor name
+		(\texttt{cname}), types of the arguments (\texttt{types}) and arguments
 		denoted by $t_1, t_2, \ldots, t_n$.  \\ \hline
 	\end{tabular}
 	\end{table}
  
 \section{Computation}
 
-In this section, we present the cost of computing.
+In this section we present the cost of performing computations in a contract
+using Scilla expressions. The cost of a computation can be divided into two
+parts: the static cost associated with the cost of employing a specific
+expression and the dynamic cost. Some expressions do not entail any dynamic
+cost.
 
 \subsection{Static Cost for Expressions}
 
@@ -130,9 +148,9 @@ Every expression has a static cost defined.
 		\texttt{\textcolor{teal}{Message}}  &  & \\ \cline{1-1}
 		\texttt{\textcolor{teal}{Fun}}  &  & \\ \cline{1-1}
 		\texttt{\textcolor{teal}{App}}  &  & \\ \cline{1-1}
-		\texttt{\textcolor{teal}{Constr}}  &  & \\ \cline{1-1}
 		\texttt{\textcolor{teal}{TFun}}  &  & \\ \cline{1-1}
-		\texttt{\textcolor{teal}{TApp}}  &  & \\ \hline
+		\texttt{\textcolor{teal}{TApp}}  &  & \\ \cline{1-1}
+		\texttt{\textcolor{teal}{Constr}}  &  & \\ \hline
 		\texttt{\textcolor{teal}{MatchExpr}}  & $nbClauses(e)$
 		&$nbClauses(\cdot)$ returns the number of clauses in the pattern match.
 		 \\ \hline
