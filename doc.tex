@@ -1,0 +1,294 @@
+\documentclass[9pt]{article}
+\usepackage{geometry}
+\geometry{
+	a4paper,
+	total={170mm,257mm},
+	left=20mm,
+	top=20mm,
+}
+% Required to make the margins smaller to fit more content on each page
+\usepackage[linkcolor=blue]{hyperref} % Required to create hyperlinks to questions from elsewhere in the document
+\hypersetup{pdfborder={0 0 0}, colorlinks=true, urlcolor=blue} % Specify a color for hyperlinks
+\usepackage{tocloft} % Required to give customize the table of contents to display questions
+\usepackage{microtype} % Slightly tweak font spacing for aesthetics
+\usepackage{palatino} % Use the Palatino font
+\usepackage{verbatim} 
+\usepackage{makeidx}
+\usepackage{xcolor}
+\usepackage{amsmath,multirow}
+% Uncomment the line below to get rid of the trailing dots in the table of contents
+%\renewcommand{\cftdot}{}
+
+% Uncomment the two lines below to get rid of the numbers in the table of contents
+%\let\Contentsline\contentsline
+%\renewcommand\contentsline[3]{\Contentsline{#1}{#2}{}}
+
+\makeindex
+
+
+\begin{document}
+
+\title{\vspace{-2cm}
+ \textbf{Gas Costs on \textsc{Zilliqa}}}
+
+\maketitle
+
+\section{Storage Cost}
+
+The storage cost (presented in \autoref{tab:storage}) depends on the type of
+literal being stored. In the table, we assume that $t$ is the literal being
+stored.
+
+
+\begin{table}[!hbt]
+	\caption{Storage cost for literals. \label{tab:storage} }
+\centering
+	\begin{tabular}{|p{2.0cm}|p{4.4cm}|p{6.0cm}|p{3cm}|}
+	\hline
+		\textbf{Literal $(t)$} & \textbf{Example} & \textbf{$Cost(t)$} & \textbf{Remarks} \\ \hline
+	  	\texttt{\textcolor{teal}{StringLit}} &  \texttt{"Hello"} & $$ 
+	  	\begin{cases}
+      20, & \text{if } len(t) \leq 20, \\
+      len(t), & \text{else } \\
+  \end{cases} $$ & $len(\cdot)$ computes the length of an input string, e.g.,
+  		$len(\texttt{"Hello"})$ = 5.  \\ \hline
+				\texttt{\textcolor{teal}{IntLit32}},
+				\texttt{\textcolor{teal}{UintLit32}}  & \texttt{Int32 -4} & 4
+				& \multirow{8}{3cm}
+				{Cost is the size of the integer in bytes.} \\ \cline{1-2} 
+		\texttt{\textcolor{teal}{IntLit64}},
+		\texttt{\textcolor{teal}{UintLit64}}   & \texttt{Int64 -4} & 8 & \\ \cline{1-2}
+		\texttt{\textcolor{teal}{IntLit128}},
+		\texttt{\textcolor{teal}{UintLit128}}  & \texttt{Int64 -4} & 16 &\\ \cline{1-2}
+		\texttt{\textcolor{teal}{IntLit256}},
+		\texttt{\textcolor{teal}{UintLit256}} & \texttt{Int64 -4} & 32 & \\ \hline
+		\texttt{\textcolor{teal}{BNum}} & \texttt{block 43}  & 32 & Internally represented as a 256
+		bits unsigned integer. \\ \hline
+		\texttt{\textcolor{teal}{ByStrX}} & \texttt{0x1cd2}  & $width(t)$ & $width(\cdot)$ returns
+		the number of bytes represented by the input, e.g.,
+		$width(\texttt{0x1cd2}) = 2.$ \\ \hline
+		\texttt{\textcolor{teal}{ByStr}} & \texttt{0x1cd2}  & $len(t)-2$ & $len(\cdot)$ returns
+		the length of the string representation of the input, e.g.,
+		$len(\texttt{0x1cd2}) = 6.$ \\ \hline
+		\texttt{\textcolor{teal}{Msg}} & \texttt{\{\_tag : "Main"; \_recipient
+		= 0x121.., \_amount =
+		Uint128 5\}} & For $t = \{s_1 : v_1; s_2 : v_2;
+		\ldots, s_n : v_n\}$:
+		$$ \begin{cases}
+    		0, & \text{if } n = 0,  \\
+    cost(\{s_2 : v_2; \ldots, s_n : v_n\}) \\
+    		 + cost(s_1) + cost(v_1), & 
+    		\text{else } \\
+  \end{cases}
+		$$ & As \texttt{\textcolor{teal}{Msg}} is an associative array
+		between a  \texttt{\textcolor{teal}{StringLit}} (denoted $s_i$) and a
+		value literal (denoted $v_i$), cost
+		is recursively computed by summing up over each $s_i : v_i$.   \\ \hline
+		\texttt{\textcolor{teal}{Map}} & \texttt{Emp Int128 Bool} &
+		For $t = \{(k_1 \rightarrow v_1), 
+		\ldots, (k_n \rightarrow v_n)\}$:
+		$$ \begin{cases}
+    		0, & \text{if } n = 0,  \\
+  			\sum_{(k \rightarrow v) \in t} {cost(k) + cost(v)},  &
+    		\text{else } \\
+  \end{cases}
+		$$ & As \texttt{\textcolor{teal}{Map}} maps a key literal ($k_i$) to a
+		value literal ($v_i$),  cost
+		is recursively computed by summing up over each $(k_i \rightarrow v_i)$ . \\ \hline
+		\texttt{\textcolor{teal}{ADTValue}} & \texttt{Some \{Bool\} True}  & For $t = \texttt{cname}\;
+		\{\texttt{types}\} \; t_1 t_2 \ldots t_n $:
+		$$ \begin{cases}
+    		0, & \text{if } n = 0,  \\
+  			\sum_{i} {cost(t_i)},  &
+    		\text{else } \\
+  		\end{cases}
+		$$ 
+		
+		& \texttt{\textcolor{teal}{ADTValue}} take a constructor name
+		(\texttt{cname}), types of the arguments \texttt{types} and arguments
+		denoted by $t_1, t_2, \ldots, t_n$.  \\ \hline
+	\end{tabular}
+	\end{table}
+ 
+\section{Computation}
+
+\subsection{Static Cost for Expressions}
+
+\begin{table}[!hbt]
+	\caption{Static cost for expressions. \label{tab:expressions} }
+\centering
+	\begin{tabular}{|c|c|p{6cm}|}
+	\hline
+		\textbf{Expression $(e)$} & \textbf{$Cost(e)$} & \textbf{Remarks} \\ \hline
+		\texttt{\textcolor{teal}{Literal}}  & \multirow{9}{*}{1}  & \\
+		\cline{1-1}
+		\texttt{\textcolor{teal}{Var}}  &  & \\ \cline{1-1}
+		\texttt{\textcolor{teal}{Let}}  &  & \\ \cline{1-1}
+		\texttt{\textcolor{teal}{Message}}  &  & \\ \cline{1-1}
+		\texttt{\textcolor{teal}{Fun}}  &  & \\ \cline{1-1}
+		\texttt{\textcolor{teal}{App}}  &  & \\ \cline{1-1}
+		\texttt{\textcolor{teal}{Constr}}  &  & \\ \cline{1-1}
+		\texttt{\textcolor{teal}{TFun}}  &  & \\ \cline{1-1}
+		\texttt{\textcolor{teal}{TApp}}  &  & \\ \hline
+		\texttt{\textcolor{teal}{MatchExpr}}  & $nbClauses(e)$
+		&$nbClauses(\cdot)$ returns the number of clauses in the pattern match.
+		 \\ \hline
+		\texttt{\textcolor{teal}{Fixpoint}}  & 1  & Rest of the cost is
+		accounted during recursive evaluation. \\ \hline
+		\texttt{\textcolor{teal}{Builtin}}  & 0 & Purely dynamic cost. \\ \hline
+	\end{tabular}
+	\end{table}
+ 
+
+\subsection{Executing Statements}
+
+\begin{table}[!hbt]
+	\caption{Static cost for statements. \label{tab:statements} }
+\centering
+	\begin{tabular}{|l|p{8cm}|p{3cm}|}
+	\hline
+		\textbf{Statement $(l)$} & \textbf{$Cost(l)$} & \textbf{Remarks} \\ \hline
+		\texttt{\textcolor{teal}{G\_Load}}  & $cost(l)$  & \\ \hline
+		\texttt{\textcolor{teal}{G\_Store}}  & $\max\{cost(l_{old}),
+		cost(l_{new})\} + cost(l_{new}) -
+		cost(l_{new})$  & \\ \hline
+		\texttt{\textcolor{teal}{G\_Bind}}  & 1 & \\ \hline
+		\texttt{\textcolor{teal}{G\_MatchStmt}}  & $nbclauses(l)$  & \\ \hline
+		\texttt{\textcolor{teal}{G\_ReadFromBC}}  & 1  & \\ \hline
+		\texttt{\textcolor{teal}{G\_AcceptPayment}}  & 1  & \\ \hline
+		\texttt{\textcolor{teal}{G\_SendMsgs}}  & For $t = [\{s_{1}^{1} :
+		v_{1}^{1}; \ldots, s_n^1 : v_n^1\}, \{s_1^2 : v_1^2; \ldots, s_n^2 :
+		v_n^2\}, \ldots, \{s_1^m : v_1^m; \ldots, s_n^2 : v_n^m\}] $: $$
+		\sum_{\ell \in t} cost(l) $$ & \\ \hline
+		\texttt{\textcolor{teal}{G\_CreateEvent}}  & $cost(e)$ & \\ \hline
+	\end{tabular}
+\end{table}
+
+
+\subsection{Builtins}
+
+\begin{table}[!hbt]
+	\caption{Dynamic cost for String Builtins. \label{tab:string_builtins} }
+\centering
+	\begin{tabular}{|c|p{4.1cm}|c|p{5cm}|}
+	\hline
+		\textbf{Category} & \textbf{Operation} & \textbf{$Cost(op)$} & \textbf{Remarks} \\ \hline
+		\multirow{3}{*}{\texttt{\textcolor{teal}{String}}} & \texttt{\textcolor{magenta}{eq}} & $cost(l)$  & \\
+		\cline{2-4}
+		 & \texttt{\textcolor{magenta}{concat}} & $cost(l)$  & \\ \cline{2-4}
+		 & \texttt{\textcolor{magenta}{substr}} & $cost(l)$  & \\ \hline \hline
+		\multirow{5}{*}{\texttt{\textcolor{teal}{Hashing}}} &
+		  \texttt{\textcolor{magenta}{eq}} & $ width(a) $  & $width(\cdot)$
+		  returns the size in number of bytes of the inputs. Note that the
+		  operator expects two inputs of the same size.  \\ \cline{2-4}
+		 & \texttt{\textcolor{magenta}{dist}} & $32$  & \\ \cline{2-4}
+		 & \texttt{\textcolor{magenta}{ripemd160hash}} & $cost(l)$  & \\
+		\cline{2-4}
+		 & \texttt{\textcolor{magenta}{sha256hash}} & $cost(l)$  & \\ \cline{2-4}
+		 & \texttt{\textcolor{magenta}{keccak256hash}} & $cost(l)$  & \\ \hline
+		 \hline
+		\multirow{4}{*}{\texttt{\textcolor{teal}{Signing}}} &
+		\texttt{\textcolor{magenta}{schnorr\_gen\_key\_pair}} & $cost(l)$  & \\
+		\cline{2-4}
+		 & \texttt{\textcolor{magenta}{schnorr\_sign}} & $cost(l)$  & \\ \cline{2-4}
+		 & \texttt{\textcolor{magenta}{schnorr\_verify}} & $cost(l)$  & \\
+		 \cline{2-4}
+		 & \texttt{\textcolor{magenta}{to\_bystr}} & $width(a)$  & $width(\cdot)$
+		 returns
+		 the number of
+		 bytes represented
+		 by the input.\\ \hline
+		 \hline
+		\multirow{6}{*}{\texttt{\textcolor{teal}{Map}}} &
+		\texttt{\textcolor{magenta}{contains}} & $cost(l)$  & \\
+		\cline{2-4}
+		 & \texttt{\textcolor{magenta}{put}} & $cost(l)$  & \\ \cline{2-4}
+		 & \texttt{\textcolor{magenta}{get}} & $cost(l)$  & \\ \cline{2-4}
+		 & \texttt{\textcolor{magenta}{remove}} & $cost(l)$  & \\ \cline{2-4}
+		 & \texttt{\textcolor{magenta}{to\_list}} & $cost(l)$  & \\ \cline{2-4}
+		 & \texttt{\textcolor{magenta}{size}} & $cost(l)$  & \\ \hline \hline
+		\multirow{4}{*}{\texttt{\textcolor{teal}{Nat}}} &
+		\texttt{\textcolor{magenta}{}} & $cost(l)$  & \\
+		\cline{2-4}
+		 & \texttt{\textcolor{magenta}{}} & $cost(l)$  & \\ \cline{2-4}
+		 & \texttt{\textcolor{magenta}{}} & $cost(l)$  & \\ \hline \hline
+		\multirow{4}{*}{\texttt{\textcolor{teal}{Int32}},
+		\texttt{\textcolor{teal}{Uint32}}} & \texttt{\textcolor{magenta}{mul}},
+		 \texttt{\textcolor{magenta}{div}}, \texttt{\textcolor{magenta}{rem}} &
+		 $ 20  $  & \\ \cline{2-4}
+		 & \texttt{\textcolor{magenta}{eq}}, \texttt{\textcolor{magenta}{lt}},
+		 \texttt{\textcolor{magenta}{add}}, \texttt{\textcolor{magenta}{sub}},
+		 \texttt{\textcolor{magenta}{to\_int32}},
+		 \texttt{\textcolor{magenta}{to\_uint32}},
+		 \texttt{\textcolor{magenta}{to\_int64}},
+		 \texttt{\textcolor{magenta}{to\_uint64}},
+		 \texttt{\textcolor{magenta}{to\_int128}},
+		 \texttt{\textcolor{magenta}{to\_uint128}},
+		 \texttt{\textcolor{magenta}{to\_int256}},
+		 \texttt{\textcolor{magenta}{to\_uint256}},
+		 \texttt{\textcolor{magenta}{to\_nat}}
+		 & $4$  & \\ \hline \hline
+		\multirow{4}{*}{\texttt{\textcolor{teal}{Int64}},
+		\texttt{\textcolor{teal}{Uint64}}} &
+		\texttt{\textcolor{magenta}{mul}},
+		 \texttt{\textcolor{magenta}{div}}, \texttt{\textcolor{magenta}{rem}} &
+		 $ 20 $  & \\ \cline{2-4}
+		 & \texttt{\textcolor{magenta}{eq}}, \texttt{\textcolor{magenta}{lt}},
+		 \texttt{\textcolor{magenta}{add}}, \texttt{\textcolor{magenta}{sub}},
+		 \texttt{\textcolor{magenta}{to\_int32}},
+		 \texttt{\textcolor{magenta}{to\_uint32}},
+		 \texttt{\textcolor{magenta}{to\_int64}},
+		 \texttt{\textcolor{magenta}{to\_uint64}},
+		 \texttt{\textcolor{magenta}{to\_int128}},
+		 \texttt{\textcolor{magenta}{to\_uint128}},
+		 \texttt{\textcolor{magenta}{to\_int256}},
+		 \texttt{\textcolor{magenta}{to\_uint256}},
+		 \texttt{\textcolor{magenta}{to\_nat}}
+		 & $4$  & \\ \hline \hline
+		\multirow{4}{*}{\texttt{\textcolor{teal}{Int128}},
+		\texttt{\textcolor{teal}{Uint128}}} &
+		\texttt{\textcolor{magenta}{mul}},
+		 \texttt{\textcolor{magenta}{div}}, \texttt{\textcolor{magenta}{rem}} &
+		 $ 40 $  & \\ \cline{2-4}
+		 & \texttt{\textcolor{magenta}{eq}}, \texttt{\textcolor{magenta}{lt}},
+		 \texttt{\textcolor{magenta}{add}}, \texttt{\textcolor{magenta}{sub}},
+		 \texttt{\textcolor{magenta}{to\_int32}},
+		 \texttt{\textcolor{magenta}{to\_uint32}},
+		 \texttt{\textcolor{magenta}{to\_int64}},
+		 \texttt{\textcolor{magenta}{to\_uint64}},
+		 \texttt{\textcolor{magenta}{to\_int128}},
+		 \texttt{\textcolor{magenta}{to\_uint128}},
+		 \texttt{\textcolor{magenta}{to\_int256}},
+		 \texttt{\textcolor{magenta}{to\_uint256}},
+		 \texttt{\textcolor{magenta}{to\_nat}}
+		 & $8$  & \\ \hline \hline
+		\multirow{4}{*}{\texttt{\textcolor{teal}{Int256}},
+		\texttt{\textcolor{teal}{Uint256}}} &
+		\texttt{\textcolor{magenta}{mul}},
+		 \texttt{\textcolor{magenta}{div}}, \texttt{\textcolor{magenta}{rem}} &
+		 $ 80 $  & \\ \cline{2-4}
+		 & \texttt{\textcolor{magenta}{eq}}, \texttt{\textcolor{magenta}{lt}},
+		 \texttt{\textcolor{magenta}{add}}, \texttt{\textcolor{magenta}{sub}},
+		 \texttt{\textcolor{magenta}{to\_int32}},
+		 \texttt{\textcolor{magenta}{to\_uint32}},
+		 \texttt{\textcolor{magenta}{to\_int64}},
+		 \texttt{\textcolor{magenta}{to\_uint64}},
+		 \texttt{\textcolor{magenta}{to\_int128}},
+		 \texttt{\textcolor{magenta}{to\_uint128}},
+		 \texttt{\textcolor{magenta}{to\_int256}},
+		 \texttt{\textcolor{magenta}{to\_uint256}},
+		 \texttt{\textcolor{magenta}{to\_nat}}
+		 & $ 16 $  & \\ \hline \hline
+		\texttt{\textcolor{teal}{BNum}} &
+		\texttt{\textcolor{magenta}{eq}}, \texttt{\textcolor{magenta}{blt}},
+		\texttt{\textcolor{magenta}{badd}} & 4  & \\ \hline 
+	\end{tabular}
+\end{table}
+
+
+
+\section{Contract Deployment}
+
+\section{Importing Standard Libraries}
+
+\end{document}
