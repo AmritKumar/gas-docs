@@ -43,36 +43,35 @@ stored.
 \begin{table}[!hbt]
 	\caption{Storage cost for literals. \label{tab:storage} }
 \centering
-	\begin{tabular}{|p{2.0cm}|p{4.4cm}|p{6.0cm}|p{3cm}|}
+	\begin{tabular}{|p{2.0cm}|p{6.5cm}|p{6cm}|}
 	\hline
-		\textbf{Literal $(t)$} & \textbf{Example} & \textbf{$Cost(t)$} & \textbf{Remarks} \\ \hline
-	  	\texttt{\textcolor{teal}{StringLit}} &  \texttt{"Hello"} & $$ 
+		\textbf{Literal $(t)$}  & \textbf{$Cost(t)$} & \textbf{Remarks} \\ \hline
+	  	\texttt{\textcolor{teal}{StringLit}}  & $$ 
 	  	\begin{cases}
       20, & \text{if } len(t) \leq 20, \\
       len(t), & \text{else } \\
   \end{cases} $$ & $len(\cdot)$ computes the length of an input string, e.g.,
   		$len(\texttt{"Hello"})$ = 5.  \\ \hline
 				\texttt{\textcolor{teal}{IntLit32}},
-				\texttt{\textcolor{teal}{UintLit32}}  & \texttt{Int32 -4} & 4
-				& \multirow{8}{3cm}
+				\texttt{\textcolor{teal}{UintLit32}}  & 4
+				& \multirow{8}{6cm}
 				{Cost is the size of the integer in bytes.} \\ \cline{1-2} 
 		\texttt{\textcolor{teal}{IntLit64}},
-		\texttt{\textcolor{teal}{UintLit64}}   & \texttt{Int64 -4} & 8 & \\ \cline{1-2}
+		\texttt{\textcolor{teal}{UintLit64}}   & 8 & \\ \cline{1-2}
 		\texttt{\textcolor{teal}{IntLit128}},
-		\texttt{\textcolor{teal}{UintLit128}}  & \texttt{Int64 -4} & 16 &\\ \cline{1-2}
+		\texttt{\textcolor{teal}{UintLit128}}   & 16 &\\ \cline{1-2}
 		\texttt{\textcolor{teal}{IntLit256}},
-		\texttt{\textcolor{teal}{UintLit256}} & \texttt{Int64 -4} & 32 & \\ \hline
-		\texttt{\textcolor{teal}{BNum}} & \texttt{block 43}  & 32 & Internally represented as a 256
+		\texttt{\textcolor{teal}{UintLit256}}  & 32 & \\ \hline
+		\texttt{\textcolor{teal}{BNum}} &  32 & Internally represented as a 256
 		bits unsigned integer. \\ \hline
-		\texttt{\textcolor{teal}{ByStrX}} & \texttt{0x1cd2}  & $width(t)$ & $width(\cdot)$ returns
+		\texttt{\textcolor{teal}{ByStrX}}  & $width(t)$ & $width(\cdot)$ returns
 		the number of bytes represented by the input, e.g.,
 		$width(\texttt{0x1cd2}) = 2.$ \\ \hline
-		\texttt{\textcolor{teal}{ByStr}} & \texttt{0x1cd2}  & $len(t)-2$ & $len(\cdot)$ returns
+		\texttt{\textcolor{teal}{ByStr}}  & $len(t)-2$ & $len(\cdot)$ returns
 		the length of the string representation of the input, e.g.,
 		$len(\texttt{0x1cd2}) = 6.$ \\ \hline
-		\texttt{\textcolor{teal}{Msg}} & \texttt{\{\_tag : "Main"; \_recipient
-		= 0x121.., \_amount =
-		Uint128 5\}} & For $t = \{s_1 : v_1; s_2 : v_2;
+		\texttt{\textcolor{teal}{Msg}} 
+		& For $t = \{s_1 : v_1; s_2 : v_2;
 		\ldots, s_n : v_n\}$:
 		$$ \begin{cases}
     		0, & \text{if } n = 0,  \\
@@ -84,7 +83,7 @@ stored.
 		between a  \texttt{\textcolor{teal}{StringLit}} (denoted $s_i$) and a
 		value literal (denoted $v_i$), cost
 		is recursively computed by summing up over each $s_i : v_i$.   \\ \hline
-		\texttt{\textcolor{teal}{Map}} & \texttt{Emp Int128 Bool} &
+		\texttt{\textcolor{teal}{Map}} &
 		For $t = \{(k_1 \rightarrow v_1), 
 		\ldots, (k_n \rightarrow v_n)\}$:
 		$$ \begin{cases}
@@ -95,7 +94,7 @@ stored.
 		$$ & As \texttt{\textcolor{teal}{Map}} maps a key literal ($k_i$) to a
 		value literal ($v_i$),  cost
 		is recursively computed by summing up over each $(k_i \rightarrow v_i)$ . \\ \hline
-		\texttt{\textcolor{teal}{ADTValue}} & \texttt{Some \{Bool\} True}  & For $t = \texttt{cname}\;
+		\texttt{\textcolor{teal}{ADTValue}} & For $t = \texttt{cname}\;
 		\{\texttt{types}\} \; t_1 t_2 \ldots t_n $:
 		$$ \begin{cases}
     		0, & \text{if } n = 0,  \\
@@ -112,7 +111,11 @@ stored.
  
 \section{Computation}
 
+In this section, we present the cost of computing.
+
 \subsection{Static Cost for Expressions}
+
+Every expression has a static cost defined. 
 
 \begin{table}[!hbt]
 	\caption{Static cost for expressions. \label{tab:expressions} }
@@ -287,8 +290,8 @@ stored.
 
 
 
-\section{Contract Deployment}
+%\section{Contract Deployment}
 
-\section{Importing Standard Libraries}
+%\section{Importing Standard Libraries}
 
 \end{document}
