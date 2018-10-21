@@ -33,8 +33,8 @@
 
 \begin{document}
 
-\title{\vspace{-2cm}
- \textbf{Gas Costs on \textsc{Zilliqa}}}
+\title{\Huge{\textbf{Gas Accounting on \textsc{Zilliqa}}} \\ \small{[Draft version
+0.1]}}
 
 \author{
  	\href{https://www.zilliqa.com/team.html}{The \textsc{Zilliqa} Team} \\
@@ -46,48 +46,49 @@
 
 \maketitle
 
-\section{Storage Cost}
+\section{Storage}
 
-Storage cost (presented in \autoref{tab:storage}) depends on the type of
-literal to be stored. In the table below, $\ell$ denotes the literal being
-stored and $litcost(\ell)$, the cost of storing it. Note that for certain
-literals such as \texttt{\textcolor{teal}{Messsage}},
-\texttt{\textcolor{teal}{Map}} and \texttt{\textcolor{teal}{ADT}},
-$litcost(\ell)$ is recursively computed. 
+Gas consumed for storage (presented in \autoref{tab:storage}) depends on
+the type of literal being stored. In the table below, $\ell$ denotes the
+literal  and $litcost(\ell)$, the cost of storing it. Note that for certain
+literal types such as \textbf{\texttt{\textcolor{teal}{Messsage}}},
+\textbf{\texttt{\textcolor{teal}{Map}}} and
+\textbf{\texttt{\textcolor{teal}{ADT}}}, $litcost(\ell)$ is recursively
+computed. 
 
 
 \begin{table}[!hbt]
-	\caption{Storage cost for literals. \label{tab:storage} }
+	\caption{Storage cost in terms of gas for literals. \label{tab:storage} }
 \centering
-	\begin{tabular}{|c|p{6.7cm}|p{6cm}|}
+	\begin{tabular}{|p{3cm}|p{6.7cm}|p{6cm}|}
 	\hline
 		\textbf{Literal Type}  & \textbf{$litcost(\ell)$} & \textbf{Remarks} \\ \hline
-	  	\texttt{\textcolor{teal}{String}}  & $$ 
+	  	\textbf{\texttt{\textcolor{teal}{String}}}  & $$ 
 	  	\begin{cases}
       20, & \text{if } len(\ell) \leq 20, \\
       len(\ell), & \text{else } \\
   \end{cases} $$ & $len(\cdot)$ computes the length of an input string, e.g.,
   		$len(\texttt{"Hello"})$ = 5.  \\ \hline
-				\texttt{\textcolor{teal}{Int32}},
-				\texttt{\textcolor{teal}{Uint32}}  & $4$
+				\textbf{\texttt{\textcolor{teal}{Int32}}},
+				\textbf{\texttt{\textcolor{teal}{Uint32}}}  & $4$
 				& \multirow{4}{6cm}
 				{Cost is the size of the integer in bytes.} \\ \cline{1-2} 
-		\texttt{\textcolor{teal}{Int64}},
-		\texttt{\textcolor{teal}{Uint64}}   & $8$ & \\ \cline{1-2}
-		\texttt{\textcolor{teal}{Int128}},
-		\texttt{\textcolor{teal}{Uint128}}   & $16$ &\\ \cline{1-2}
-		\texttt{\textcolor{teal}{Int256}},
-		\texttt{\textcolor{teal}{Uint256}}  & $32$ & \\ \hline
-		\texttt{\textcolor{teal}{BNum}} &  $32$ & Internally represented as a
+		\textbf{\texttt{\textcolor{teal}{Int64}}},
+		\textbf{\texttt{\textcolor{teal}{Uint64}}}   & $8$ & \\ \cline{1-2}
+		\textbf{\texttt{\textcolor{teal}{Int128}}},
+		\textbf{\texttt{\textcolor{teal}{Uint128}}}   & $16$ &\\ \cline{1-2}
+		\textbf{\texttt{\textcolor{teal}{Int256}}},
+		\textbf{\texttt{\textcolor{teal}{Uint256}}}  & $32$ & \\ \hline
+		\textbf{\texttt{\textcolor{teal}{BNum}}} &  $32$ & Internally represented as a
 		256-bits unsigned integer. \textcolor{red}{Is this correct? } \\ \hline
-		\texttt{\textcolor{teal}{ByStrX}}  & $width(\ell)$ & $width(\cdot)$ returns
+		\textbf{\texttt{\textcolor{teal}{ByStrX}}}  & $width(\ell)$ & $width(\cdot)$ returns
 		the number of bytes needed to represent the hexadecimal input, e.g.,
 		$width(\texttt{0x1cd2}) = 2.$ \\ \hline
-		\texttt{\textcolor{teal}{ByStr}}  & $len(\ell)-2$ & $len(\cdot)$ returns
+		\textbf{\texttt{\textcolor{teal}{ByStr}}}  & $len(\ell)-2$ & $len(\cdot)$ returns
 		the length of the string representation of the input, e.g.,
 		$len(\texttt{0x1cd2}) = 6. $ \textcolor{red}{So, the cost of ByStrX and ByStr is the
 		same? ByStrX, ByStr and String should be comparable.} \\ \hline
-		\texttt{\textcolor{teal}{Messsage}} 
+		\textbf{\texttt{\textcolor{teal}{Messsage}}} 
 		& For $\ell = \{s_1 : v_1; s_2 : v_2;
 		\ldots, s_n : v_n\}$:
 		$$ \begin{cases}
@@ -96,12 +97,12 @@ $litcost(\ell)$ is recursively computed.
     		 + litcost(s_1) + litcost(v_1), & 
     		\text{else } \\
   \end{cases}
-		$$ & As a \texttt{\textcolor{teal}{Messsage}} literal is an associative array
-		between a  \texttt{\textcolor{teal}{String}} literal (denoted $s_i$) and a
+		$$ & As a \textbf{\texttt{\textcolor{teal}{Messsage}}} literal is an associative array
+		between a  \textbf{\texttt{\textcolor{teal}{String}}} literal (denoted $s_i$) and a
 		value literal (denoted $v_i$), $litcost$
 		is recursively computed by summing up over each $s_i : v_i$.
 		\textcolor{red}{Base case is incorrect.}   \\ \hline
-		\texttt{\textcolor{teal}{Map}} &
+		\textbf{\texttt{\textcolor{teal}{Map}}} &
 		For $\ell = \{(k_1 \rightarrow v_1), 
 		\ldots, (k_n \rightarrow v_n)\}$:
 		$$ \begin{cases}
@@ -109,10 +110,13 @@ $litcost(\ell)$ is recursively computed.
   			\sum_{(k \rightarrow v) \in \ell} {litcost(k) + litcost(v)},  &
     		\text{else } \\
   \end{cases}
-		$$ & As a \texttt{\textcolor{teal}{Map}} literal maps a key literal ($k_i$) to a
+		$$ & As a \textbf{\texttt{\textcolor{teal}{Map}}} literal maps a key literal ($k_i$) to a
 		value literal ($v_i$),  $litcost$
 		is recursively computed by summing up over each $(k_i \rightarrow v_i)$. \textcolor{red}{Base case is incorrect.} \\ \hline
-		\texttt{\textcolor{teal}{ADT}} & For $\ell = \texttt{cname}\;
+		\textbf{\texttt{\textcolor{teal}{ADT}}} (e.g.,
+		\textbf{\textcolor{magenta}{\texttt{Bool}}},
+		\textbf{\textcolor{magenta}{\texttt{Option}}},
+		\textbf{\textcolor{magenta}{\texttt{List}}}) & For $\ell = \texttt{cname}\;
 		\{\texttt{types}\} \; t_1 t_2 \ldots t_n $:
 		$$ \begin{cases}
     		0, & \text{if } n = 0,  \\
@@ -121,7 +125,7 @@ $litcost(\ell)$ is recursively computed.
   		\end{cases}
 		$$ 
 		
-		& An \texttt{\textcolor{teal}{ADT}} literal takes a constructor name
+		& An \textbf{\texttt{\textcolor{teal}{ADT}}} literal takes a constructor name
 		(\texttt{cname}), types of the arguments (\texttt{types}) and arguments
 		denoted by $t_1, t_2, \ldots, t_n$. $litcost$ is recursively computed
 		by summing up the cost over each $t_i$. \textcolor{red}{Base case is incorrect.} \\ \hline
@@ -130,46 +134,66 @@ $litcost(\ell)$ is recursively computed.
  
 \section{Computation}
 
-In this section we present the cost of performing computations in a contract
-using Scilla expressions. The cost of a computation can be divided into two
-parts: the static cost associated with the cost of employing a specific
-expression and the dynamic cost. Some expressions do not entail any dynamic
-cost.
+In this section, we present the cost of performing computations in a contract
+using \textsc{Scilla} \emph{expressions}. Expressions handle purely
+mathematical computations and do not have any side-effects. 
+
+Cost of a computation via an expression can be divided into two parts: the
+static cost associated with employing a specific expression and the dynamic
+cost that takes into account the cost that can only be estimated at run time.
+Some expressions do not entail any dynamic cost.
 
 \subsection{Static Cost for Expressions}
 
-Every expression has a static cost defined. 
+Every expression has a static cost associated with it.
+\autoref{tab:expressions} lists the cost of each expression supported in
+\textsc{Scilla}. In the table below, $e$ denotes the expression and
+$statcost(e)$ the static cost associated with using $e$.
 
 \begin{table}[!hbt]
-	\caption{Static cost for expressions. \label{tab:expressions} }
+	\caption{Gas consumed for expressions. \label{tab:expressions} }
 \centering
-	\begin{tabular}{|c|c|p{6cm}|}
+	\begin{tabular}{|c|c|p{8.5cm}|}
 	\hline
-		\textbf{Expression $(e)$} & \textbf{$Cost(e)$} & \textbf{Remarks} \\ \hline
-		\texttt{\textcolor{teal}{Literal}}  & \multirow{9}{*}{1}  & \\
-		\cline{1-1}
-		\texttt{\textcolor{teal}{Var}}  &  & \\ \cline{1-1}
-		\texttt{\textcolor{teal}{Let}}  &  & \\ \cline{1-1}
-		\texttt{\textcolor{teal}{Message}}  &  & \\ \cline{1-1}
-		\texttt{\textcolor{teal}{Fun}}  &  & \\ \cline{1-1}
-		\texttt{\textcolor{teal}{App}}  &  & \\ \cline{1-1}
-		\texttt{\textcolor{teal}{TFun}}  &  & \\ \cline{1-1}
-		\texttt{\textcolor{teal}{TApp}}  &  & \\ \cline{1-1}
-		\texttt{\textcolor{teal}{Constr}}  &  & \\ \hline
-		\texttt{\textcolor{teal}{MatchExpr}}  & $nbClauses(e)$
+		\textbf{Expression} & \textbf{$statcost(e)$} & \textbf{Remarks} \\ \hline
+		\textbf{\texttt{\textcolor{teal}{Literal}}}  & \multirow{9}{*}{1}  & \\
+		\cline{1-1} \cline{3-3}
+		\textbf{\texttt{\textcolor{teal}{Var}}}  &  & \\ \cline{1-1}\cline{3-3}
+
+		\textbf{\texttt{\textcolor{teal}{Let}}}  &  & \\ \cline{1-1}\cline{3-3}
+
+		\textbf{\texttt{\textcolor{teal}{Message}}}  &  & \\ \cline{1-1}\cline{3-3}
+		\textbf{\texttt{\textcolor{teal}{Fun}}}  &  & A function declaration, e.g., \texttt{\textbf{\textcolor{violet}{fun}} (x : \textbf{\textcolor{orange}{T}}) => e}. \\ \cline{1-1} \cline{3-3}
+		\textbf{\texttt{\textcolor{teal}{App}}}  &  & A function application, e.g.,
+			\texttt{\textbf{\textcolor{violet}{f}} <x\_i>}. \\ \cline{1-1}\cline{3-3}
+
+			\textbf{\texttt{\textcolor{teal}{TFun}}}  &  & A type function of
+			the form: \texttt{\textbf{\textcolor{violet}{tfun}} $\alpha$ => e}. \\ \cline{1-1}\cline{3-3}
+
+			\textbf{\texttt{\textcolor{teal}{TApp}}}  &  & A type
+			instantiation: \texttt{\textbf{\textcolor{violet}{@}}x
+			\textbf{\textcolor{orange}{T}}}. \\ \cline{1-1}\cline{3-3}
+
+			\textbf{\texttt{\textcolor{teal}{Constr}}}  &  & Constructors. \\ \hline
+			\textbf{\texttt{\textcolor{teal}{MatchExpr}}}  & $nbClauses(e)$
 		&$nbClauses(\cdot)$ returns the number of clauses in the pattern match.
 		 \\ \hline
-		\texttt{\textcolor{teal}{Fixpoint}}  & 1  & Rest of the cost is
+	   \textbf{\texttt{\textcolor{teal}{Fixpoint}}}  & 1  & Rest of the cost is
 		accounted during recursive evaluation. \\ \hline
-		\texttt{\textcolor{teal}{Builtin}}  & 0 & Purely dynamic cost. \\ \hline
+		\textbf{\texttt{\textcolor{teal}{Builtin}}}  & 0 & Purely dynamic cost. \\ \hline
 	\end{tabular}
 	\end{table}
  
 
 \subsection{Executing Statements}
 
+State changes and other operations that entail side-effects such as reading the
+current state of the blockchain or invoking message calls to other contracts
+are performed via \textsc{Scilla} \emph{statements}. \autoref{tab:statements}
+presents the gas consumed for statements.
+
 \begin{table}[!hbt]
-	\caption{Static cost for statements. \label{tab:statements} }
+	\caption{Gas for statements. \label{tab:statements} }
 \centering
 	\begin{tabular}{|l|p{8cm}|p{3cm}|}
 	\hline
