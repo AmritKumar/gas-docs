@@ -50,7 +50,10 @@
 
 Storage cost (presented in \autoref{tab:storage}) depends on the type of
 literal to be stored. In the table below, $\ell$ denotes the literal being
-stored and $litcost(\ell)$, the cost of storing it.
+stored and $litcost(\ell)$, the cost of storing it. Note that for certain
+literals such as \texttt{\textcolor{teal}{Messsage}},
+\texttt{\textcolor{teal}{Map}} and \texttt{\textcolor{teal}{ADT}},
+$litcost(\ell)$ is recursively computed. 
 
 
 \begin{table}[!hbt]
