@@ -9,7 +9,7 @@
 % Required to make the margins smaller to fit more content on each page
 \usepackage[linkcolor=blue]{hyperref} % Required to create hyperlinks to questions from elsewhere in the document
 \hypersetup{pdfborder={0 0 0}, colorlinks=true, urlcolor=blue} % Specify a color for hyperlinks
-\usepackage{tocloft} % Required to give customize the table of contents to display questions
+%\usepackage{tocloft} % Required to give customize the table of contents to display questions
 \usepackage{microtype} % Slightly tweak font spacing for aesthetics
 \usepackage{palatino} % Use the Palatino font
 \usepackage{verbatim} 
@@ -41,7 +41,8 @@
     \Mundus~\href{https://www.zilliqa.com}{\texttt{www.zilliqa.com}}
 \Letter~\href{mailto:enquiry@zilliqa.com}{\texttt{enquiry@zilliqa.com}}
 \faTwitter~\href{https://twitter.com/zilliqa}{\texttt{@zilliqa}
-}}
+}
+}
 
 
 \maketitle
@@ -50,19 +51,19 @@
 
 Gas consumed for storage (presented in \autoref{tab:storage}) depends on
 the type of literal being stored. In the table below, $\ell$ denotes the
-literal  and $litcost(\ell)$, the cost of storing it. Note that for certain
+literal  and $litGas(\ell)$, the gas consumed for storing it. Note that for certain
 literal types such as \textbf{\texttt{\textcolor{teal}{Messsage}}},
 \textbf{\texttt{\textcolor{teal}{Map}}} and
-\textbf{\texttt{\textcolor{teal}{ADT}}}, $litcost(\ell)$ is recursively
+\textbf{\texttt{\textcolor{teal}{ADT}}}, $litGas(\ell)$ is recursively
 computed. 
 
 
 \begin{table}[!hbt]
-	\caption{Storage cost in terms of gas for literals. \label{tab:storage} }
+	\caption{Gas required for storage of literals. \label{tab:storage} }
 \centering
 	\begin{tabular}{|p{3cm}|p{6.7cm}|p{6cm}|}
 	\hline
-		\textbf{Literal Type}  & \textbf{$litcost(\ell)$} & \textbf{Remarks} \\ \hline
+		\textbf{Literal Type}  & \textbf{$litGas(\ell)$} & \textbf{Remarks} \\ \hline
 	  	\textbf{\texttt{\textcolor{teal}{String}}}  & $$ 
 	  	\begin{cases}
       20, & \text{if } len(\ell) \leq 20, \\
@@ -72,7 +73,7 @@ computed.
 				\textbf{\texttt{\textcolor{teal}{Int32}}},
 				\textbf{\texttt{\textcolor{teal}{Uint32}}}  & $4$
 				& \multirow{4}{6cm}
-				{Cost is the size of the integer in bytes.} \\ \cline{1-2} 
+				{Gas consumed is equal to the size of integer in bytes.} \\ \cline{1-2} 
 		\textbf{\texttt{\textcolor{teal}{Int64}}},
 		\textbf{\texttt{\textcolor{teal}{Uint64}}}   & $8$ & \\ \cline{1-2}
 		\textbf{\texttt{\textcolor{teal}{Int128}}},
@@ -93,13 +94,13 @@ computed.
 		\ldots, s_n : v_n\}$:
 		$$ \begin{cases}
     		0, & \text{if } n = 0,  \\
-    litcost(\{s_2 : v_2; \ldots, s_n : v_n\}) \\
-    		 + litcost(s_1) + litcost(v_1), & 
+    litGas(\{s_2 : v_2; \ldots, s_n : v_n\}) \\
+    		 + litGas(s_1) + litGas(v_1), & 
     		\text{else } \\
   \end{cases}
 		$$ & As a \textbf{\texttt{\textcolor{teal}{Messsage}}} literal is an associative array
 		between a  \textbf{\texttt{\textcolor{teal}{String}}} literal (denoted $s_i$) and a
-		value literal (denoted $v_i$), $litcost$
+		value literal (denoted $v_i$), $litGas$
 		is recursively computed by summing up over each $s_i : v_i$.
 		\textcolor{red}{Base case is incorrect.}   \\ \hline
 		\textbf{\texttt{\textcolor{teal}{Map}}} &
@@ -107,12 +108,12 @@ computed.
 		\ldots, (k_n \rightarrow v_n)\}$:
 		$$ \begin{cases}
     		0, & \text{if } n = 0,  \\
-  			\sum_{(k \rightarrow v) \in \ell} {litcost(k) + litcost(v)},  &
+  			\sum_{(k \rightarrow v) \in \ell} {litGas(k) + litGas(v)},  &
     		\text{else } \\
   \end{cases}
 		$$ & As a \textbf{\texttt{\textcolor{teal}{Map}}} literal maps a key literal ($k_i$) to a
-		value literal ($v_i$),  $litcost$
-		is recursively computed by summing up over each $(k_i \rightarrow v_i)$. \textcolor{red}{Base case is incorrect.} \\ \hline
+		value literal ($v_i$),  $litGas$
+		is recursively computed by summing up over each $k_i \rightarrow v_i$. \textcolor{red}{Base case is incorrect.} \\ \hline
 		\textbf{\texttt{\textcolor{teal}{ADT}}} (e.g.,
 		\textbf{\textcolor{magenta}{\texttt{Bool}}},
 		\textbf{\textcolor{magenta}{\texttt{Option}}},
@@ -120,42 +121,42 @@ computed.
 		\{\texttt{types}\} \; t_1 t_2 \ldots t_n $:
 		$$ \begin{cases}
     		0, & \text{if } n = 0,  \\
-  			\sum_{i} {litcost(t_i)},  &
+  			\sum_{i} {litGas(t_i)},  &
     		\text{else } \\
   		\end{cases}
 		$$ 
 		
 		& An \textbf{\texttt{\textcolor{teal}{ADT}}} literal takes a constructor name
 		(\texttt{cname}), types of the arguments (\texttt{types}) and arguments
-		denoted by $t_1, t_2, \ldots, t_n$. $litcost$ is recursively computed
-		by summing up the cost over each $t_i$. \textcolor{red}{Base case is incorrect.} \\ \hline
+		denoted by $t_1, t_2, \ldots, t_n$. $litGas$ is recursively computed
+		by summing up the gas required over each $t_i$. \textcolor{red}{Base case is incorrect.} \\ \hline
 	\end{tabular}
 	\end{table}
  
 \section{Computation}
 
-In this section, we present the cost of performing computations in a contract
+In this section, we present the gas required to perform computations in a contract
 using \textsc{Scilla} \emph{expressions}. Expressions handle purely
 mathematical computations and do not have any side-effects. 
 
-Cost of a computation via an expression can be divided into two parts: the
-static cost associated with employing a specific expression and the dynamic
-cost that takes into account the cost that can only be estimated at run time.
-Some expressions do not entail any dynamic cost.
+Gas consumed for a computation via an expression can be divided into two parts: the
+static part associated with employing a specific expression and the dynamic
+part that takes into account the cost that can only be estimated at run time.
+Some expressions do not entail any dynamic gas consumption.
 
 \subsection{Static Cost for Expressions}
 
-Every expression has a static cost associated with it.
-\autoref{tab:expressions} lists the cost of each expression supported in
+Every expression has a static gas associated with it.
+\autoref{tab:expressions} lists the gas for each expression supported in
 \textsc{Scilla}. In the table below, $e$ denotes the expression and
-$statcost(e)$ the static cost associated with using $e$.
+$statExprCost(e)$ the static gas associated with using $e$.
 
 \begin{table}[!hbt]
 	\caption{Gas consumed for expressions. \label{tab:expressions} }
 \centering
 	\begin{tabular}{|c|c|p{8.5cm}|}
 	\hline
-		\textbf{Expression} & \textbf{$statcost(e)$} & \textbf{Remarks} \\ \hline
+		\textbf{Expression} & \textbf{$statExprGas(e)$} & \textbf{Remarks} \\ \hline
 		\textbf{\texttt{\textcolor{teal}{Literal}}}  & \multirow{9}{*}{1}  & \\
 		\cline{1-1} \cline{3-3}
 		\textbf{\texttt{\textcolor{teal}{Var}}}  &  & \\ \cline{1-1}\cline{3-3}
@@ -178,9 +179,9 @@ $statcost(e)$ the static cost associated with using $e$.
 			\textbf{\texttt{\textcolor{teal}{MatchExpr}}}  & $nbClauses(e)$
 		&$nbClauses(\cdot)$ returns the number of clauses in the pattern match.
 		 \\ \hline
-	   \textbf{\texttt{\textcolor{teal}{Fixpoint}}}  & 1  & Rest of the cost is
+	   \textbf{\texttt{\textcolor{teal}{Fixpoint}}}  & 1  & Rest of the gas is
 		accounted during recursive evaluation. \\ \hline
-		\textbf{\texttt{\textcolor{teal}{Builtin}}}  & 0 & Purely dynamic cost. \\ \hline
+		\textbf{\texttt{\textcolor{teal}{Builtin}}}  & 0 & Purely dynamic gas accouting. \\ \hline
 	\end{tabular}
 	\end{table}
  
