@@ -1,0 +1,4 @@
+1. Put non-zero base cost for Map and Message.
+2. String substr
+3. What happens when digests for eq are not of the same size?
+4. 
