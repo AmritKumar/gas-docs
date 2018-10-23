@@ -47,9 +47,9 @@
 
 \section{Storage}
 
-Gas consumed for storage (presented in \autoref{tab:storage}) depends on
-the type of literal being stored. In the table below, $\ell$ denotes the
-literal  and $litGas(\ell)$, the gas consumed for storing it. Note that for certain
+Gas consumed for storage (presented in \autoref{tab:storage}) depends on the
+type of literal being stored. In the table below, $\ell$ denotes the literal
+and $litGas(\ell)$, the gas consumed for storing it. Note that for certain
 literal types such as \textbf{\texttt{\textcolor{teal}{Messsage}}},
 \textbf{\texttt{\textcolor{teal}{Map}}} and
 \textbf{\texttt{\textcolor{teal}{ADT}}}, $litGas(\ell)$ is recursively
@@ -223,121 +223,145 @@ $litGas(\cdot)$ function used below comes from~\autoref{tab:storage}.
 
 \subsection{Builtins}
 
+In~\autoref{tab:gas_builtins}, we present the dynamic gas associated with
+\textbf{\texttt{\textcolor{teal}{Builtin}}} operators in \textsc{Scilla}. The
+gas consumed often depends on the operator and operand types, etc. In the table
+below, we group \textbf{\texttt{\textcolor{teal}{Builtin}}} in categories which
+are self-explanatory.
+
 \begin{table}[!hbt]
-	\caption{Dynamic cost for String Builtins. \label{tab:gas_builtins} }
+	\caption{Dynamic gas for  Builtins. \label{tab:gas_builtins} }
 \centering
 	\begin{tabular}{|c|p{4.1cm}|c|p{5cm}|}
 	\hline
 		\textbf{Category} & \textbf{Operation} & \textbf{$Cost(op)$} & \textbf{Remarks} \\ \hline
-		\multirow{3}{*}{\texttt{\textcolor{teal}{String}}} & \texttt{\textcolor{magenta}{eq}} & $cost(l)$  & \\
+		\multirow{3}{*}{\textbf{\texttt{\textcolor{teal}{String}}}} &
+		\textbf{\texttt{\textcolor{magenta}{eq}}} & $cost(l)$  & \\
 		\cline{2-4}
-		 & \texttt{\textcolor{magenta}{concat}} & $cost(l)$  & \\ \cline{2-4}
-		 & \texttt{\textcolor{magenta}{substr}} & $cost(l)$  & \\ \hline \hline
-		\multirow{5}{*}{\texttt{\textcolor{teal}{Hashing}}} &
-		  \texttt{\textcolor{magenta}{eq}} & $ width(a) $  & $width(\cdot)$
+		 & \texttt{\textbf{\textcolor{magenta}{concat}}} & $cost(l)$  & \\ \cline{2-4}
+		 & \textbf{\texttt{\textcolor{magenta}{substr}}} & $cost(l)$  & \\ \hline \hline
+		\multirow{5}{*}{\textbf{\texttt{\textcolor{teal}{Hashing}}}} &
+		  \textbf{\texttt{\textcolor{magenta}{eq}}} & $ width(a) $  & $width(\cdot)$
 		  returns the size in number of bytes of the inputs. Note that the
 		  operator expects two inputs of the same size.  \\ \cline{2-4}
-		 & \texttt{\textcolor{magenta}{dist}} & $32$  & \\ \cline{2-4}
-		 & \texttt{\textcolor{magenta}{ripemd160hash}} & $cost(l)$  & \\
+		 & \textbf{\texttt{\textcolor{magenta}{dist}}} & $32$  & \\ \cline{2-4}
+		 & \textbf{\texttt{\textcolor{magenta}{ripemd160hash}}} & $cost(l)$  & \\
 		\cline{2-4}
-		 & \texttt{\textcolor{magenta}{sha256hash}} & $cost(l)$  & \\ \cline{2-4}
-		 & \texttt{\textcolor{magenta}{keccak256hash}} & $cost(l)$  & \\ \hline
+		 & \textbf{\texttt{\textcolor{magenta}{sha256hash}}} & $cost(l)$  & \\ \cline{2-4}
+		 & \textbf{\texttt{\textcolor{magenta}{keccak256hash}}} & $cost(l)$  & \\ \hline
 		 \hline
-		\multirow{4}{*}{\texttt{\textcolor{teal}{Signing}}} &
-		\texttt{\textcolor{magenta}{schnorr\_gen\_key\_pair}} & $cost(l)$  & \\
+		\multirow{4}{*}{\textbf{\texttt{\textcolor{teal}{Signing}}}} &
+		\textbf{\texttt{\textcolor{magenta}{schnorr\_gen\_key\_pair}}} & $cost(l)$  & \\
 		\cline{2-4}
-		 & \texttt{\textcolor{magenta}{schnorr\_sign}} & $cost(l)$  & \\ \cline{2-4}
-		 & \texttt{\textcolor{magenta}{schnorr\_verify}} & $cost(l)$  & \\
+		 & \textbf{\texttt{\textcolor{magenta}{schnorr\_sign}}} & $cost(l)$  & \\ \cline{2-4}
+		 & \textbf{\texttt{\textcolor{magenta}{schnorr\_verify}}} & $cost(l)$  & \\
 		 \cline{2-4}
-		 & \texttt{\textcolor{magenta}{to\_bystr}} & $width(a)$  & $width(\cdot)$
+		 & \textbf{\texttt{\textcolor{magenta}{to\_bystr}}} & $width(a)$  & $width(\cdot)$
 		 returns
 		 the number of
 		 bytes represented
 		 by the input.\\ \hline
 		 \hline
-		\multirow{6}{*}{\texttt{\textcolor{teal}{Map}}} &
-		\texttt{\textcolor{magenta}{contains}} & $cost(l)$  & \\
+		\multirow{6}{*}{\textbf{\texttt{\textcolor{teal}{Map}}}} &
+		\textbf{\texttt{\textcolor{magenta}{contains}}} & $cost(l)$  & \\
 		\cline{2-4}
-		 & \texttt{\textcolor{magenta}{put}} & $cost(l)$  & \\ \cline{2-4}
-		 & \texttt{\textcolor{magenta}{get}} & $cost(l)$  & \\ \cline{2-4}
-		 & \texttt{\textcolor{magenta}{remove}} & $cost(l)$  & \\ \cline{2-4}
-		 & \texttt{\textcolor{magenta}{to\_list}} & $cost(l)$  & \\ \cline{2-4}
-		 & \texttt{\textcolor{magenta}{size}} & $cost(l)$  & \\ \hline \hline
-		\multirow{4}{*}{\texttt{\textcolor{teal}{Nat}}} &
+		 & \textbf{\texttt{\textcolor{magenta}{put}}} & $cost(l)$  & \\ \cline{2-4}
+		 & \textbf{\texttt{\textcolor{magenta}{get}}} & $cost(l)$  & \\ \cline{2-4}
+		 & \textbf{\texttt{\textcolor{magenta}{remove}}} & $cost(l)$  & \\ \cline{2-4}
+		 & \textbf{\texttt{\textcolor{magenta}{to\_list}}} & $cost(l)$  & \\ \cline{2-4}
+		 & \textbf{\texttt{\textcolor{magenta}{size}}} & $cost(l)$  & \\ \hline \hline
+		\multirow{4}{*}{\textbf{\texttt{\textcolor{teal}{Nat}}}} &
 		\texttt{\textcolor{magenta}{}} & $cost(l)$  & \\
 		\cline{2-4}
 		 & \texttt{\textcolor{magenta}{}} & $cost(l)$  & \\ \cline{2-4}
 		 & \texttt{\textcolor{magenta}{}} & $cost(l)$  & \\ \hline \hline
-		\multirow{4}{*}{\texttt{\textcolor{teal}{Int32}},
-		\texttt{\textcolor{teal}{Uint32}}} & \texttt{\textcolor{magenta}{mul}},
-		 \texttt{\textcolor{magenta}{div}}, \texttt{\textcolor{magenta}{rem}} &
+		\multirow{4}{*}{\textbf{\texttt{\textcolor{teal}{Int32}}},
+		\textbf{\texttt{\textcolor{teal}{Uint32}}}} &
+		\textbf{\texttt{\textcolor{magenta}{mul}}},
+		 \textbf{\texttt{\textcolor{magenta}{div}}},
+		 \textbf{\texttt{\textcolor{magenta}{rem}}} &
 		 $ 20  $  & \\ \cline{2-4}
-		 & \texttt{\textcolor{magenta}{eq}}, \texttt{\textcolor{magenta}{lt}},
-		 \texttt{\textcolor{magenta}{add}}, \texttt{\textcolor{magenta}{sub}},
-		 \texttt{\textcolor{magenta}{to\_int32}},
-		 \texttt{\textcolor{magenta}{to\_uint32}},
-		 \texttt{\textcolor{magenta}{to\_int64}},
-		 \texttt{\textcolor{magenta}{to\_uint64}},
-		 \texttt{\textcolor{magenta}{to\_int128}},
-		 \texttt{\textcolor{magenta}{to\_uint128}},
-		 \texttt{\textcolor{magenta}{to\_int256}},
-		 \texttt{\textcolor{magenta}{to\_uint256}},
-		 \texttt{\textcolor{magenta}{to\_nat}}
+		 & \textbf{\texttt{\textcolor{magenta}{eq}}},
+		 \textbf{\texttt{\textcolor{magenta}{lt}}},
+		 \textbf{\texttt{\textcolor{magenta}{add}}},
+		 \textbf{\texttt{\textcolor{magenta}{sub}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_int32}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_uint32}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_int64}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_uint64}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_int128}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_uint128}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_int256}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_uint256}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_nat}}}
 		 & $4$  & \\ \hline \hline
-		\multirow{4}{*}{\texttt{\textcolor{teal}{Int64}},
-		\texttt{\textcolor{teal}{Uint64}}} &
-		\texttt{\textcolor{magenta}{mul}},
-		 \texttt{\textcolor{magenta}{div}}, \texttt{\textcolor{magenta}{rem}} &
+		\multirow{4}{*}{\textbf{\texttt{\textcolor{teal}{Int64}}},
+		\textbf{\texttt{\textcolor{teal}{Uint64}}}} &
+		\textbf{\texttt{\textcolor{magenta}{mul}}},
+		 \textbf{\texttt{\textcolor{magenta}{div}}},
+		 \textbf{\texttt{\textcolor{magenta}{rem}}} &
 		 $ 20 $  & \\ \cline{2-4}
-		 & \texttt{\textcolor{magenta}{eq}}, \texttt{\textcolor{magenta}{lt}},
-		 \texttt{\textcolor{magenta}{add}}, \texttt{\textcolor{magenta}{sub}},
-		 \texttt{\textcolor{magenta}{to\_int32}},
-		 \texttt{\textcolor{magenta}{to\_uint32}},
-		 \texttt{\textcolor{magenta}{to\_int64}},
-		 \texttt{\textcolor{magenta}{to\_uint64}},
-		 \texttt{\textcolor{magenta}{to\_int128}},
-		 \texttt{\textcolor{magenta}{to\_uint128}},
-		 \texttt{\textcolor{magenta}{to\_int256}},
-		 \texttt{\textcolor{magenta}{to\_uint256}},
-		 \texttt{\textcolor{magenta}{to\_nat}}
+		 & 
+		 \textbf{\texttt{\textcolor{magenta}{eq}}},
+		 \textbf{\texttt{\textcolor{magenta}{lt}}},
+		 \textbf{\texttt{\textcolor{magenta}{add}}},
+		 \textbf{\texttt{\textcolor{magenta}{sub}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_int32}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_uint32}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_int64}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_uint64}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_int128}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_uint128}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_int256}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_uint256}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_nat}}}
 		 & $4$  & \\ \hline \hline
-		\multirow{4}{*}{\texttt{\textcolor{teal}{Int128}},
-		\texttt{\textcolor{teal}{Uint128}}} &
-		\texttt{\textcolor{magenta}{mul}},
-		 \texttt{\textcolor{magenta}{div}}, \texttt{\textcolor{magenta}{rem}} &
+		\multirow{4}{*}{\textbf{\texttt{\textcolor{teal}{Int128}}},
+		\textbf{\texttt{\textcolor{teal}{Uint128}}}} &
+		\textbf{\texttt{\textcolor{magenta}{mul}}},
+		 \textbf{\texttt{\textcolor{magenta}{div}}},
+		 \textbf{\texttt{\textcolor{magenta}{rem}}} &
 		 $ 40 $  & \\ \cline{2-4}
-		 & \texttt{\textcolor{magenta}{eq}}, \texttt{\textcolor{magenta}{lt}},
-		 \texttt{\textcolor{magenta}{add}}, \texttt{\textcolor{magenta}{sub}},
-		 \texttt{\textcolor{magenta}{to\_int32}},
-		 \texttt{\textcolor{magenta}{to\_uint32}},
-		 \texttt{\textcolor{magenta}{to\_int64}},
-		 \texttt{\textcolor{magenta}{to\_uint64}},
-		 \texttt{\textcolor{magenta}{to\_int128}},
-		 \texttt{\textcolor{magenta}{to\_uint128}},
-		 \texttt{\textcolor{magenta}{to\_int256}},
-		 \texttt{\textcolor{magenta}{to\_uint256}},
-		 \texttt{\textcolor{magenta}{to\_nat}}
+		 & 
+		 \textbf{\texttt{\textcolor{magenta}{eq}}},
+		 \textbf{\texttt{\textcolor{magenta}{lt}}},
+		 \textbf{\texttt{\textcolor{magenta}{add}}},
+		 \textbf{\texttt{\textcolor{magenta}{sub}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_int32}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_uint32}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_int64}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_uint64}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_int128}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_uint128}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_int256}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_uint256}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_nat}}}
 		 & $8$  & \\ \hline \hline
-		\multirow{4}{*}{\texttt{\textcolor{teal}{Int256}},
-		\texttt{\textcolor{teal}{Uint256}}} &
-		\texttt{\textcolor{magenta}{mul}},
-		 \texttt{\textcolor{magenta}{div}}, \texttt{\textcolor{magenta}{rem}} &
+		\multirow{4}{*}{\textbf{\texttt{\textcolor{teal}{Int256}}},
+		\textbf{\texttt{\textcolor{teal}{Uint256}}}} &
+		\textbf{\texttt{\textcolor{magenta}{mul}}},
+		 \textbf{\texttt{\textcolor{magenta}{div}}},
+		 \textbf{\texttt{\textcolor{magenta}{rem}}} &
 		 $ 80 $  & \\ \cline{2-4}
-		 & \texttt{\textcolor{magenta}{eq}}, \texttt{\textcolor{magenta}{lt}},
-		 \texttt{\textcolor{magenta}{add}}, \texttt{\textcolor{magenta}{sub}},
-		 \texttt{\textcolor{magenta}{to\_int32}},
-		 \texttt{\textcolor{magenta}{to\_uint32}},
-		 \texttt{\textcolor{magenta}{to\_int64}},
-		 \texttt{\textcolor{magenta}{to\_uint64}},
-		 \texttt{\textcolor{magenta}{to\_int128}},
-		 \texttt{\textcolor{magenta}{to\_uint128}},
-		 \texttt{\textcolor{magenta}{to\_int256}},
-		 \texttt{\textcolor{magenta}{to\_uint256}},
-		 \texttt{\textcolor{magenta}{to\_nat}}
+		 &
+		 \textbf{\texttt{\textcolor{magenta}{eq}}},
+		 \textbf{\texttt{\textcolor{magenta}{lt}}},
+		 \textbf{\texttt{\textcolor{magenta}{add}}},
+		 \textbf{\texttt{\textcolor{magenta}{sub}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_int32}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_uint32}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_int64}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_uint64}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_int128}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_uint128}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_int256}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_uint256}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_nat}}}
 		 & $ 16 $  & \\ \hline \hline
-		\texttt{\textcolor{teal}{BNum}} &
-		\texttt{\textcolor{magenta}{eq}}, \texttt{\textcolor{magenta}{blt}},
-		\texttt{\textcolor{magenta}{badd}} & $32$  & \\ \hline 
+		\textbf{\texttt{\textcolor{teal}{BNum}}} &
+		\textbf{\texttt{\textcolor{magenta}{eq}}},
+		\textbf{\texttt{\textcolor{magenta}{blt}}},
+		\textbf{\texttt{\textcolor{magenta}{badd}}} & $32$  & \\ \hline 
 	\end{tabular}
 \end{table}
 
