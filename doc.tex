@@ -1,10 +1,10 @@
-\documentclass[9pt]{article}
+\documentclass[10pt]{article}
 \usepackage{geometry}
 \geometry{
 	a4paper,
 	total={170mm,257mm},
-	left=20mm,
-	top=20mm,
+	%left=20mm,
+	%top=30mm,
 }
 % Required to make the margins smaller to fit more content on each page
 \usepackage[linkcolor=blue]{hyperref} % Required to create hyperlinks to questions from elsewhere in the document
@@ -25,8 +25,9 @@
 \usepackage{marvosym}
 \usepackage{fontawesome}
 \usepackage{tipa}
-
-
+\usepackage{ltablex}
+\usepackage{caption, booktabs}
+\usepackage{ragged2e}
 
 \makeindex
 
@@ -34,7 +35,7 @@
 \begin{document}
 
 \title{\Huge{\textbf{Gas Accounting on \textsc{Zilliqa}}} \\ \small{[Draft version
-0.1]}}
+0.1]} \\ \small{\textcolor{red}{For Internal Circulation Only}}}
 
 \author{
  	\href{https://www.zilliqa.com/team.html}{The \textsc{Zilliqa} Team} \\
@@ -229,12 +230,23 @@ gas consumed often depends on the operator and operand types, etc. In the table
 below, we group \textbf{\texttt{\textcolor{teal}{Builtin}}} in categories which
 are self-explanatory.
 
-\begin{table}[!hbt]
-	\caption{Dynamic gas for  Builtins. \label{tab:gas_builtins} }
-\centering
-	\begin{tabular}{|c|p{4.1cm}|p{4cm}|p{4cm}|}
-	\hline
-		\textbf{Category} & \textbf{Operation} & \textbf{$Cost(op)$} & \textbf{Remarks} \\ \hline
+
+\begin{tabularx}{\linewidth}{|l|p{4.1cm}|p{4cm}|p{4cm}|}
+	\caption{Gas required for Builtin operations.} \label{tab:gas_builtins} \\
+\hline
+	\textbf{Category} & \textbf{Operation} & \textbf{$builtinGas$} & \textbf{Remarks} \\ \hline
+\hline
+\endfirsthead
+\hline
+	\textbf{Category} & \textbf{Operation} & \textbf{$builtinGas$} & \textbf{Remarks} \\ \hline
+\hline
+\endhead
+%\midrule
+\hline
+\multicolumn{4}{r}{\footnotesize( To be continued)}
+\endfoot
+%\bottomrule
+\endlastfoot
 		\multirow{3}{*}{\textbf{\texttt{\textcolor{teal}{String}}}} &
 		\textbf{\texttt{\textcolor{magenta}{eq}}} & For \textbf{
 			\texttt{\textcolor{magenta}{eq}}} $s_1\, s_2$: $$ \min \{len(s_1), len(s_2)\} $$ 
@@ -254,54 +266,74 @@ are self-explanatory.
 		  $$  & $width(\cdot)$
 		  returns the size in number of bytes of the input. Note that the
 		  operator expects two inputs of the same size.  \\ \cline{2-4}
-		 & \textbf{\texttt{\textcolor{magenta}{dist}}} & $32$  & We currently
-		 only support  \textbf{\texttt{\textcolor{magenta}{dist}}} for
-		 \textbf{\textcolor{orange}{\texttt{ByStr32}}}. \\ \cline{2-4}
+		 & \textbf{\texttt{\textcolor{magenta}{dist}}} & $32$  &
+		 \textbf{\texttt{\textcolor{magenta}{dist}}} computes the distance
+		 between two \textbf{\textcolor{orange}{\texttt{ByStr32}}} values. \\ \cline{2-4}
 		 & \textbf{\texttt{\textcolor{magenta}{ripemd160hash}}} & For
-		 \textbf{\texttt{\textcolor{magenta}{ripemd160hash}}} $x$:  $$\left\lceil
-		 \frac{size(x)}{64}\right \rceil + 10 $$ & \multirow{7}{4cm}{$size(\cdot)$ returns the
-		 number  of bytes in the internal representation of the input. Gas
-		 consumed is
+		 \textbf{\texttt{\textcolor{magenta}{ripemd160hash}}} $x$:   $$ 10
+		 \times \left\lceil
+		 \frac{size(x)}{64}\right \rceil $$ & \multirow{3}{4cm}{\justify{$size(\cdot)$
+		 returns the size of the serialized input in bytes. Gas consumed is
 		 dependent on the input size and the block size of the hash function.
 		 Block sizes of  \textbf{\texttt{\textcolor{magenta}{ripemd160hash}}},
 		 \textbf{\texttt{\textcolor{magenta}{sha256hash}}} and
 		 \textbf{\texttt{\textcolor{magenta}{keccak256hash}}} are 64, 64 and
-		 136 bytes respectively.}   \\
+		 136 bytes respectively.}}   \\
 		\cline{2-3}
 		 & \textbf{\texttt{\textcolor{magenta}{sha256hash}}} & For
-		 \textbf{\texttt{\textcolor{magenta}{sha256hash}}} $x$:  $$\left\lceil
-		 \frac{size(x)}{64}\right \rceil + 15 $$  & \\ \cline{2-3}
+		 \textbf{\texttt{\textcolor{magenta}{sha256hash}}} $x$:  $$15 \times \left\lceil
+		 \frac{size(x)}{64}\right \rceil  $$  & \\ \cline{2-3}
 		 & \textbf{\texttt{\textcolor{magenta}{keccak256hash}}} &
 		  For
-		 \textbf{\texttt{\textcolor{magenta}{keccak256hash}}} $x$:  $$\left\lceil
-		 \frac{size(x)}{136}\right \rceil + 15 $$ 
+		 \textbf{\texttt{\textcolor{magenta}{keccak256hash}}} $x$:  $$ 15
+		 \times \left\lceil  \frac{size(x)}{136}\right \rceil $$ 
 		   & \\ \hline
 		 \hline
 		\multirow{4}{*}{\textbf{\texttt{\textcolor{teal}{Signing}}}} &
-		\textbf{\texttt{\textcolor{magenta}{schnorr\_gen\_key\_pair}}} & $cost(l)$  & \\
+		\textbf{\texttt{\textcolor{magenta}{schnorr\_gen\_key\_pair}}} & $ 20 $  & \\
 		\cline{2-4}
-		 & \textbf{\texttt{\textcolor{magenta}{schnorr\_sign}}} & $cost(l)$  & \\ \cline{2-4}
-		 & \textbf{\texttt{\textcolor{magenta}{schnorr\_verify}}} & $cost(l)$  & \\
-		 \cline{2-4}
-		 & \textbf{\texttt{\textcolor{magenta}{to\_bystr}}} & $width(a)$  & $width(\cdot)$
+		 & \textbf{\texttt{\textcolor{magenta}{schnorr\_sign}}} & For~\textbf{\texttt{\textcolor{magenta}{schnorr\_sign}}} $k_{priv} \,
+		 k_{pub}
+		 \, m:$ $$350 + 15
+		 \times \left\lceil
+		 \frac{66+size(m)}{64}\right \rceil  $$ & Signing requires computing hash
+		 of the input message and other parameters (of size 66 bytes). The
+		 constant cost of 350 is for elliptic curve operations and other base
+		 field operations. \\ \cline{2-4}
+		 & \textbf{\texttt{\textcolor{magenta}{schnorr\_verify}}} &
+		 For~\textbf{\texttt{\textcolor{magenta}{schnorr\_verify}}} $
+		 k_{pub} 
+		 \, m \, sig:$ $$250 + 15
+		 \times \left\lceil
+		 \frac{66+size(m)}{64}\right \rceil  $$  & Verification also requires computing hash
+		 of the input message and other parameters (of size 66 bytes). The
+		 constant cost of 250 is for elliptic curve operations and other base
+		 field operations. Verification is cheaper than signing. \\
+		 \hline \hline
+		 \textbf{\texttt{\textcolor{teal}{ByStrX}}} &
+		 \textbf{\texttt{\textcolor{magenta}{to\_bystr}}} & $width(a)$  &
+		 \textbf{\texttt{\textcolor{magenta}{to\_bystr}}} is a conversion utility to
+		 convert from \textbf{\texttt{\textcolor{teal}{ByStrX}}} to
+		 \textbf{\texttt{\textcolor{teal}{ByStr}}}.   $width(\cdot)$
 		 returns
 		 the number of
 		 bytes represented
 		 by the input.\\ \hline
 		 \hline
-		\multirow{6}{*}{\textbf{\texttt{\textcolor{teal}{Map}}}} &
-		\textbf{\texttt{\textcolor{magenta}{contains}}} & $cost(l)$  & \\
+		\multirow{2}{*}{\textbf{\texttt{\textcolor{teal}{Map}}}} &
+		\textbf{\texttt{\textcolor{magenta}{contains}}},
+		\textbf{\texttt{\textcolor{magenta}{get}}}  & $1$ & Requires constant
+		time.  \\
 		\cline{2-4}
-		 & \textbf{\texttt{\textcolor{magenta}{put}}} & $cost(l)$  & \\ \cline{2-4}
-		 & \textbf{\texttt{\textcolor{magenta}{get}}} & $cost(l)$  & \\ \cline{2-4}
-		 & \textbf{\texttt{\textcolor{magenta}{remove}}} & $cost(l)$  & \\ \cline{2-4}
-		 & \textbf{\texttt{\textcolor{magenta}{to\_list}}} & $cost(l)$  & \\ \cline{2-4}
-		 & \textbf{\texttt{\textcolor{magenta}{size}}} & $cost(l)$  & \\ \hline \hline
+		 & \textbf{\texttt{\textcolor{magenta}{put}}},
+		 \textbf{\texttt{\textcolor{magenta}{remove}}},
+		 \textbf{\texttt{\textcolor{magenta}{to\_list}}},
+		 \textbf{\texttt{\textcolor{magenta}{size}}}    & $ 1 +
+		 sizeOfMap$  & $sizeofMap$ is the size of the underlying hash table. \\
+		 \hline \hline
 		\multirow{4}{*}{\textbf{\texttt{\textcolor{teal}{Nat}}}} &
-		\texttt{\textcolor{magenta}{}} & $cost(l)$  & \\
-		\cline{2-4}
-		 & \texttt{\textcolor{magenta}{}} & $cost(l)$  & \\ \cline{2-4}
-		 & \texttt{\textcolor{magenta}{}} & $cost(l)$  & \\ \hline \hline
+		\textbf{\texttt{\textcolor{magenta}{to\_nat}}} & For
+		\textbf{\texttt{\textcolor{magenta}{to\_nat}}} $i$: $$i$$  & \\ \hline \hline
 		\multirow{4}{*}{\textbf{\texttt{\textcolor{teal}{Int32}}},
 		\textbf{\texttt{\textcolor{teal}{Uint32}}}} &
 		\textbf{\texttt{\textcolor{magenta}{mul}}},
@@ -389,13 +421,27 @@ are self-explanatory.
 		\textbf{\texttt{\textcolor{magenta}{eq}}},
 		\textbf{\texttt{\textcolor{magenta}{blt}}},
 		\textbf{\texttt{\textcolor{magenta}{badd}}} & $32$  & \\ \hline 
-	\end{tabular}
-\end{table}
-
-
+\end{tabularx}
 
 \section{Contract Deployment and Transition Invocation}
 
-\section{Importing Standard Libraries}
+In addition to the above gas, there is an upfront cost for contract deployment and
+transition invocations. The goal of these costs is to prevent spam attacks. 
+
+At the time of contract deployment, an end user will provide two input files:
+one containing the contract (a \texttt{.scilla} file) and the other containing
+the value of the immutable parameters (a JSON file). The upfront gas consumed
+for contract deployment is equal to the size (in bytes) of the \textsc{Scilla}
+file plus that of the JSON file.  
+
+In a similar manner, at the time of contract invocation, and end user (as a
+part of a transaction) or a contract (as a part of a message call)  will supply
+a JSON file that will contain information on which transition needs to be
+invoked and the parameters to pass. Gas associated with such transition calls
+is equal to the size of this JSON file. 
+
+%\section{Importing Standard Libraries}
+
+
 
 \end{document}
